@@ -91,7 +91,43 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  // ── Existing flow: direct Google OAuth code exchange ─────────────────
+  // ── General Supabase OAuth flow (Google SSO from login/signup) ────────
+  // If no onboarding param and no GOOGLE_CLIENT_ID config, treat as Supabase OAuth
+  const cookieStoreGeneral = await cookies();
+  const supabaseGeneral = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return cookieStoreGeneral.getAll();
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            cookieStoreGeneral.set(name, value, options)
+          );
+        },
+      },
+    }
+  );
+
+  // Try Supabase code exchange first
+  const { data: sessionData, error: sessionError } =
+    await supabaseGeneral.auth.exchangeCodeForSession(code);
+
+  if (!sessionError && sessionData.session) {
+    // Check if user has completed onboarding
+    const { data: profile } = await supabaseGeneral
+      .from("profiles")
+      .select("onboarding_completed")
+      .eq("id", sessionData.session.user.id)
+      .single();
+
+    const destination = profile?.onboarding_completed ? "/app" : "/onboarding";
+    return NextResponse.redirect(new URL(destination, request.url));
+  }
+
+  // ── Fallback: direct Google OAuth code exchange ─────────────────────
   const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
