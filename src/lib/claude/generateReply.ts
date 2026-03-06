@@ -28,6 +28,8 @@ const TONE_INSTRUCTIONS: Record<Tone, string> = {
     "Write in a formal, clear, and polished tone. Be courteous and business-appropriate. Avoid slang or overly casual language.",
   personal:
     "Write in a personal, heartfelt tone. Reference specific details from the review. Use the reviewer's name naturally. Make it feel like a human wrote this, not a template.",
+  casual:
+    "Write in a very relaxed, fun, and laid-back tone. Use short sentences, exclamation marks, and informal language. Sound like a friend, not a business.",
   custom:
     "Write in a balanced, natural tone that sounds like a real business owner responding personally.",
 };

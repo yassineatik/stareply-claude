@@ -2,7 +2,7 @@
 
 export type Plan = "free" | "starter" | "growth" | "agency";
 
-export type Tone = "friendly" | "professional" | "personal" | "custom";
+export type Tone = "friendly" | "professional" | "personal" | "custom" | "casual";
 
 export interface Profile {
   id: string;
@@ -12,6 +12,7 @@ export interface Profile {
   stripe_customer_id: string | null;
   replies_used: number;
   replies_limit: number;
+  onboarding_completed: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -28,6 +29,9 @@ export interface Location {
   industry: string | null;
   brand_keywords: string[];
   avoid_keywords: string[];
+  custom_instructions: string | null;
+  average_rating: number | null;
+  total_reviews: number | null;
   created_at: string;
   updated_at: string;
 }
